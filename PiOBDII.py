@@ -82,7 +82,7 @@ import PDF
 
 
 DISPLAY_PERIOD = 100
-TIMER_PERIOD = 500
+TIMER_PERIOD = 100
 
 
 # Start value for pygame user events.

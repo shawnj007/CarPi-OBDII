@@ -114,11 +114,12 @@ class Visual:
 		# Default colours to use on the visual object.
 		self.ColourBlack = pygame.Color(0x00, 0x00, 0x00)
 		self.ColourGrey = pygame.Color(0x5F, 0x5F, 0x5F)
-		self.ColourText = pygame.Color(0x00, 0x00, 0x00)
+		#self.ColourText = pygame.Color(0x00, 0x00, 0x00)
+		self.ColourText = pygame.Color(0xa5, 0x00, 0x34)
 		self.ColourValueText = pygame.Color(0xAF, 0xAF, 0x00)
 		self.ColourBorder = pygame.Color(0x7F, 0x7F, 0x7F)
-		self.ColourFillDown = pygame.Color(0x7F, 0xFF, 0xFF)
-		self.ColourFillUp = pygame.Color(0x7F, 0x7F, 0xFF)
+		self.ColourFillDown = pygame.Color(0xe8, 0x32, 0x00)
+		self.ColourFillUp = pygame.Color(0x66, 0x66, 0x66)
 		self.ColourFill = self.ColourFillUp
 		self.ColourDialog = pygame.Color(0x3F, 0xFF, 0x3F)
 		self.ColourConfigDialog = pygame.Color(0x3F, 0x3F, 0xFF)
@@ -140,11 +141,11 @@ class Visual:
 					FontFile = pygame.freetype.match_font(FontName, True)
 					break
 		# Configure default font sizes to be used on the visual object.
-		Fonts["TinyFontSize"] = int(self.DisplayXLen / 160)
+		Fonts["TinyFontSize"] = int(self.DisplayXLen / 90)
 		Fonts["TinyFont"] = pygame.freetype.Font(FontFile, Fonts["TinyFontSize"])
 		Fonts["SmallFontSize"] = int(self.DisplayXLen / 80)
 		Fonts["SmallFont"] = pygame.freetype.Font(FontFile, Fonts["SmallFontSize"])
-		Fonts["NormalFontSize"] = int(self.DisplayXLen / 60)
+		Fonts["NormalFontSize"] = int(self.DisplayXLen / 70)
 		Fonts["NormalFont"] = pygame.freetype.Font(FontFile, Fonts["NormalFontSize"])
 		Fonts["NormalFont"].style = pygame.freetype.STYLE_STRONG
 		Fonts["LargeFontSize"] = int(self.DisplayXLen / 50)

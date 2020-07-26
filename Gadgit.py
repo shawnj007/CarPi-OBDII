@@ -60,15 +60,16 @@ class Gadgit(Visual.Visual):
 				"LABEL" : Text,
 				"WIDTH" : xLen,
 				"HEIGHT" : yLen,
-				"POINTER_WIDTH" : 3,
+				"POINTER_WIDTH" : 6,
 				"LABEL_COLOUR" : pygame.Color(0xFF, 0xFF, 0x00),
 				"VALUE_COLOUR" : pygame.Color(0xFF, 0x00, 0x00),
 				"POINTER_COLOUR" : pygame.Color(0xFF, 0x00, 0x00),
 				"BACKGROUND_COLOUR" : pygame.Color(0x00, 0x00, 0x00),
 				"BACKGROUND_IMAGE" : "ICONS/carbon-fiber-faceplate.png",
 				"BAR_COLOUR" : pygame.Color(0x00, 0xFF, 0x00),
-				"BAR_MID_COLOUR" : pygame.Color(0xFF, 0xFF, 0x00),
 				"BAR_HIGH_COLOUR" : pygame.Color(0xFF, 0x00, 0x00),
+				"BAR_MID_COLOUR" : pygame.Color(0xFF, 0xFF, 0x00),
+				"BAR_LOW_COLOUR" : pygame.Color(0x00, 0xFF, 0x00),
 				"FILL_COLOUR" : pygame.Color(0xFF, 0xFF, 0xFF)
 			},
 			STYLE_VERTICAL_BAR : {
@@ -82,8 +83,9 @@ class Gadgit(Visual.Visual):
 				"BACKGROUND_COLOUR" : pygame.Color(0x00, 0x00, 0x00),
 				"BACKGROUND_IMAGE" : "ICONS/carbon-fiber-faceplate.png",
 				"BAR_COLOUR" : pygame.Color(0x00, 0xFF, 0x00),
-				"BAR_MID_COLOUR" : pygame.Color(0xFF, 0xFF, 0x00),
 				"BAR_HIGH_COLOUR" : pygame.Color(0xFF, 0x00, 0x00),
+				"BAR_MID_COLOUR" : pygame.Color(0xFF, 0xFF, 0x00),
+				"BAR_LOW_COLOUR" : pygame.Color(0x00, 0xFF, 0x00),
 				"FILL_COLOUR" : pygame.Color(0x5F, 0x5F, 0x5F)
 			},
 			STYLE_HORIZONTAL_BAR : {
@@ -97,8 +99,9 @@ class Gadgit(Visual.Visual):
 				"BACKGROUND_COLOUR" : pygame.Color(0x00, 0x00, 0x00),
 				"BACKGROUND_IMAGE" : "ICONS/carbon-fiber-faceplate.png",
 				"BAR_COLOUR" : pygame.Color(0x00, 0xFF, 0x00),
-				"BAR_MID_COLOUR" : pygame.Color(0xFF, 0xFF, 0x00),
 				"BAR_HIGH_COLOUR" : pygame.Color(0xFF, 0x00, 0x00),
+				"BAR_MID_COLOUR" : pygame.Color(0xFF, 0xFF, 0x00),
+				"BAR_LOW_COLOUR" : pygame.Color(0x00, 0xFF, 0x00),
 				"FILL_COLOUR" : pygame.Color(0x5F, 0x5F, 0x5F)
 			},
 			STYLE_TEXT : {
@@ -112,8 +115,9 @@ class Gadgit(Visual.Visual):
 				"BACKGROUND_COLOUR" : pygame.Color(0x00, 0x00, 0x00),
 				"BACKGROUND_IMAGE" : "ICONS/carbon-fiber-faceplate.png",
 				"BAR_COLOUR" : pygame.Color(0x00, 0xFF, 0x00),
-				"BAR_MID_COLOUR" : pygame.Color(0xFF, 0xFF, 0x00),
 				"BAR_HIGH_COLOUR" : pygame.Color(0xFF, 0x00, 0x00),
+				"BAR_MID_COLOUR" : pygame.Color(0xFF, 0xFF, 0x00),
+				"BAR_LOW_COLOUR" : pygame.Color(0x00, 0xFF, 0x00),
 				"FILL_COLOUR" : pygame.Color(0x5F, 0x5F, 0x5F)
 			},
 		}
@@ -126,6 +130,8 @@ class Gadgit(Visual.Visual):
 		self.Style = STYLE_GAGUE
 		self.ValueMin = 0
 		self.ValueHigh = 80
+		self.ValueMid = 60
+		self.ValueLow = 40
 		self.ValueMax = 100
 		self.Value = 0
 
@@ -204,6 +210,14 @@ class Gadgit(Visual.Visual):
 			self.ValueHigh = float(ValueDefinition[ELM327.FIELD_PID_HIGH_1])
 		else:
 			self.ValueHigh = 0
+		if len(ValueDefinition) > ELM327.FIELD_PID_MID_1:
+			self.ValueMid = float(ValueDefinition[ELM327.FIELD_PID_MID_1])
+		else:
+			self.ValueMid = 0
+		if len(ValueDefinition) > ELM327.FIELD_PID_LOW_1:
+			self.ValueLow = float(ValueDefinition[ELM327.FIELD_PID_LOW_1])
+		else:
+			self.ValueLow = 0
 
 
 
@@ -242,6 +256,7 @@ class Gadgit(Visual.Visual):
 		self.BarColour = self.StyleAttrib[self.Style]["BAR_COLOUR"]
 		self.BarHighColour = self.StyleAttrib[self.Style]["BAR_HIGH_COLOUR"]
 		self.BarMidColour = self.StyleAttrib[self.Style]["BAR_MID_COLOUR"]
+		self.BarLowColour = self.StyleAttrib[self.Style]["BAR_LOW_COLOUR"]
 		self.FillColour = self.StyleAttrib[self.Style]["FILL_COLOUR"]
 		
 		self.backImage = pygame.image.load(self.StyleAttrib[self.Style]["BACKGROUND_IMAGE"])
@@ -295,7 +310,7 @@ class Gadgit(Visual.Visual):
 		PointerRatio = (0.000001 + ThisValue - self.ValueMin) / (self.ValueMax - self.ValueMin)
 		PointerHighRatio = (0.000001 + self.ValueHigh - self.ValueMin) / (self.ValueMax - self.ValueMin)
 		# Erase the background.
-		pygame.draw.rect(ThisSurface, self.BackgroundColour, (self.xPos, self.yPos, self.xLen, self.yLen), 0)
+		#pygame.draw.rect(ThisSurface, self.BackgroundColour, (self.xPos, self.yPos, self.xLen, self.yLen), 0)
 		# Display a border around the full area.
 		#pygame.draw.rect(ThisSurface, self.ColourBorder, (self.xPos, self.yPos, self.xLen, self.yLen), 1)
 
@@ -307,9 +322,15 @@ class Gadgit(Visual.Visual):
 			OriginX = int(Visual.X_MARGIN + self.xPos + (self.xLen - 2*Visual.X_MARGIN) / 2)
 			OriginY = int(Visual.Y_MARGIN + self.yPos + (self.yLen - 2*Visual.Y_MARGIN) / 2)
 			Radius = int(self.xLen / 2 ) #- 8 * Visual.X_MARGIN)
-
+			
 			if Radius > 50:
 				fontSizeSelect = "SmallFont"
+
+			if Radius >= 65:
+				fontSizeSelect = "NormalFont"
+
+			if Radius >= 75:
+				fontSizeSelect = "LargeFont"
 
 			# Draw gague background.
 			#pygame.draw.circle(self.ThisSurface, self.FillColour, (OriginX, OriginY), Radius, 0)
@@ -320,14 +341,39 @@ class Gadgit(Visual.Visual):
 			ThisSurface.blit(self.backImage, (self.xPos, self.yPos))
 			
 			# Draw green/yellow/red arcs
-			#pygame.draw.arc(self.ThisSurface, self.BarHighColour, (7*Visual.X_MARGIN + self.xPos, 7*Visual.Y_MARGIN + self.yPos, self.xLen - 14*Visual.X_MARGIN, self.yLen - 14*Visual.Y_MARGIN), -0.4 * math.pi, -0.2 * math.pi, 3*Visual.X_MARGIN)
-			#pygame.draw.arc(self.ThisSurface, self.BarMidColour,  (7*Visual.X_MARGIN + self.xPos, 7*Visual.Y_MARGIN + self.yPos, self.xLen - 14*Visual.X_MARGIN, self.yLen - 14*Visual.Y_MARGIN), -0.2 * math.pi,  0.2 * math.pi, 2*Visual.X_MARGIN)
-			#pygame.draw.arc(self.ThisSurface, self.BarColour,     (7*Visual.X_MARGIN + self.xPos, 7*Visual.Y_MARGIN + self.yPos, self.xLen - 14*Visual.X_MARGIN, self.yLen - 14*Visual.Y_MARGIN),  0.2 * math.pi,  1.5 * math.pi, 1*Visual.X_MARGIN)
-			pygame.draw.arc(self.ThisSurface, self.BarHighColour, (7*Visual.X_MARGIN + self.xPos, 7*Visual.Y_MARGIN + self.yPos, self.xLen - 14*Visual.X_MARGIN, self.yLen - 14*Visual.Y_MARGIN), -0.4 * math.pi, -0.2 * math.pi, 3*Visual.X_MARGIN)
-			pygame.draw.arc(self.ThisSurface, self.BarMidColour,  (7*Visual.X_MARGIN + self.xPos, 7*Visual.Y_MARGIN + self.yPos, self.xLen - 14*Visual.X_MARGIN, self.yLen - 14*Visual.Y_MARGIN), -0.2 * math.pi,  0.2 * math.pi, 2*Visual.X_MARGIN)
-			pygame.draw.arc(self.ThisSurface, self.BarColour,     (7*Visual.X_MARGIN + self.xPos, 7*Visual.Y_MARGIN + self.yPos, self.xLen - 14*Visual.X_MARGIN, self.yLen - 14*Visual.Y_MARGIN),  0.2 * math.pi,  1.5 * math.pi, 1*Visual.X_MARGIN)
+			margin = 0.08
+			rect = (self.xPos + margin * self.xLen, self.yPos + margin * self.yLen, self.xLen * (1 - 2 * margin), self.yLen * (1 - 2 * margin))
 			
-			for Angle in range(0, 100, 10):
+			HighColourHigh = -0.3 * math.pi
+			#HighColourLow = -0.1 * math.pi
+			#HighColourLow = (-0.3 + (( 0.9 * self.ValueMax - self.ValueHigh) / (0.8 * (self.ValueMax - self.ValueMin)))) * math.pi
+			HighColourLow = (-0.5 * math.pi) + (2 * math.pi * ((self.ValueMax - self.ValueHigh) / (self.ValueMax - self.ValueMin)))
+			HighColourWidth = 4 * Visual.X_MARGIN
+			pygame.draw.arc(self.ThisSurface, self.BarHighColour, rect, HighColourHigh, HighColourLow, HighColourWidth)
+			
+			MidColourHigh = HighColourLow
+			#MidColourLow = -0.1 * math.pi
+			#MidColourLow = (-0.3 + (( 0.9 * self.ValueMax - self.ValueMid) / (0.8 * (self.ValueMax - self.ValueMin)))) * math.pi
+			MidColourLow = (-0.5 * math.pi) + (2 * math.pi * ((self.ValueMax - self.ValueMid) / (self.ValueMax - self.ValueMin)))
+			
+			if MidColourHigh > MidColourLow:
+				(MidColourHigh, MidColourLow) = (MidColourLow, MidColourHigh)
+			
+			MidColourWidth = 3 * Visual.X_MARGIN
+			pygame.draw.arc(self.ThisSurface, self.BarMidColour, rect, MidColourHigh, MidColourLow, MidColourWidth)
+			
+			LowColourHigh = MidColourLow
+			#LowColourLow = -0.1 * math.pi
+			#LowColourLow = (-0.3 + (( 0.9 * self.ValueMax - self.ValueLow) / (0.8 * (self.ValueMax - self.ValueMin)))) * math.pi
+			LowColourLow = (-0.5 * math.pi) + (2 * math.pi * ((self.ValueMax - self.ValueLow) / (self.ValueMax - self.ValueMin)))
+			
+			if LowColourHigh > LowColourLow:
+				(LowColourHigh, LowColourLow) = (LowColourLow, LowColourHigh)
+				
+			LowColourWidth = 2 * Visual.X_MARGIN
+			pygame.draw.arc(self.ThisSurface, self.BarLowColour, rect, LowColourHigh, LowColourLow, LowColourWidth)
+			
+			for Angle in range(10, 91, 10):
 				AngleX1 = (.85 * Radius) * math.sin((math.pi / 180) * (-360 * Angle/100))
 				AngleY1 = (.85 * Radius) * math.cos((math.pi / 180) * (-360 * Angle/100))
 				AngleX2 = (.7 * Radius) * math.sin((math.pi / 180) * (-360 * Angle/100))
@@ -338,7 +384,7 @@ class Gadgit(Visual.Visual):
 					TickWidth = 2
 				pygame.draw.line(self.ThisSurface, self.PointerColour, (OriginX + AngleX1, OriginY + AngleY1), (OriginX + AngleX2, OriginY + AngleY2), TickWidth)
 				
-			for Angle in range(0, 100, 10):
+			for Angle in range(10, 91, 10):
 				x = math.sin((math.pi / 180) * (-360 * Angle/100))
 				y = math.cos((math.pi / 180) * (-360 * Angle/100))
 			
@@ -353,6 +399,7 @@ class Gadgit(Visual.Visual):
 
 			DisplayText = self.LayoutText(TextLabels[ELM327.FIELD_PID_DESCRIPTION], 2, self.xLen - 4 * Visual.X_MARGIN, Visual.Fonts[fontSizeSelect])
 			DisplayTextOffset = 0
+			
 			for DisplayTextLine in DisplayText.split('\n'):
 				ThisText = DisplayTextLine
 				TextHeight = Visual.Fonts[fontSizeSelect].get_rect(ThisText)[3]

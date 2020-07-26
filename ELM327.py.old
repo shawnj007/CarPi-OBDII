@@ -51,7 +51,7 @@ SERIAL_LINEFEED_TYPE = b'\r'
 
 # ELM327 Device related constants.
 ELM_RESET_PERIOD = 1
-ELM_CONNECT_SETTLE_PERIOD = 5
+ELM_CONNECT_SETTLE_PERIOD = 3
 
 # Constant string responses.
 STRING_NOT_IMPLEMENTED = "!NOT IMPLEMENTED!"
@@ -532,8 +532,9 @@ class ELM327:
 #/* add them to the list of currently supported PIDs for the ECU. */
 #/*****************************************************************/
 	def ResolvePidData(self, PidMode, PidData, PidStart, PidDescriptions, FreezeIndex = -1):
-		print("[" + PidStart + "]")
-		print("[" + PidData + "]")
+		if DEBUG == "ON":
+			print("[" + PidStart + "]")
+			print("[" + PidData + "]")
 		PidStartValue = int(PidStart, 16)
 		PidValue = int(PidData, 16)
 		Count = PidStartValue + (len(PidData) * 4)
@@ -1015,7 +1016,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("020C" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 3)
-			Result = (256 * int(Response[:2], 16) + int(Response[2:4], 16)) / 4
+			Result = (256 * int(Response[:1], 16) + int(Response[1:2], 16)) / 4
 		if DEBUG == "ON":
 			print(Result)
 		return Result
@@ -1034,7 +1035,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("020D" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 3)
-			Result = int(Response[:2], 16) * 0.621371		# Convert km/h -> mph (non-standard)
+			Result = int(Response, 16) * 0.621371		# Convert km/h -> mph (non-standard)
 		if DEBUG == "ON":
 			print(Result)
 		return Result
@@ -1053,7 +1054,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("020E" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 3)
-			Result = (int(Response[:2], 16) / 2) - 64
+			Result = (int(Response, 16) / 2) - 64
 		if DEBUG == "ON":
 			print(Result)
 		return Result
@@ -1072,7 +1073,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("020F" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 3)
-			Result = int(Response[:2], 16) - 40
+			Result = int(Response, 16) - 40
 		if DEBUG == "ON":
 			print(Result)
 		return Result
@@ -1091,7 +1092,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("0210" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 3)
-			Result = (256 * int(Response[:2], 16) + int(Response[2:4], 16)) / 100
+			Result = (256 * int(Response[:1], 16) + int(Response[1:2], 16)) / 100
 		if DEBUG == "ON":
 			print(Result)
 		return Result
@@ -1110,7 +1111,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("0211" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 3)
-			Result = 100 * int(Response[:2], 16) / 255
+			Result = 100 * int(Response, 16) / 255
 		if DEBUG == "ON":
 			print(Result)
 		return Result
@@ -1170,7 +1171,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("0214" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 3)
-			Result = ( int(Response[:2], 16) / 200, (100 * int(Response[2:4], 16) / 128) - 100 )
+			Result = ( int(Response[:1], 16) / 200, (100 * int(Response[1:2], 16) / 128) - 100 )
 
 		return Result
 	PidFunctions["0114"] = PID0114
@@ -1188,7 +1189,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("0215" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 3)
-			Result = ( int(Response[:2], 16) / 200, (100 * int(Response[2:4], 16) / 128) - 100 )
+			Result = ( int(Response[:1], 16) / 200, (100 * int(Response[1:2], 16) / 128) - 100 )
 		if DEBUG == "ON":
 			print(Result)
 		return Result
@@ -1207,7 +1208,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("0216" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 3)
-			Result = ( int(Response[:2], 16) / 200, (100 * int(Response[2:4], 16) / 128) - 100 )
+			Result = ( int(Response[:1], 16) / 200, (100 * int(Response[1:2], 16) / 128) - 100 )
 
 		return Result
 	PidFunctions["0116"] = PID0116
@@ -1225,7 +1226,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("0217" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 3)
-			Result = ( int(Response[:2], 16) / 200, (100 * int(Response[2:4], 16) / 128) - 100 )
+			Result = ( int(Response[:1], 16) / 200, (100 * int(Response[1:2], 16) / 128) - 100 )
 
 		return Result
 	PidFunctions["0117"] = PID0117
@@ -1243,7 +1244,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("0218" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 3)
-			Result = ( int(Response[:2], 16) / 200, (100 * int(Response[2:4], 16) / 128) - 100 )
+			Result = ( int(Response[:1], 16) / 200, (100 * int(Response[1:2], 16) / 128) - 100 )
 
 		return Result
 	PidFunctions["0118"] = PID0118
@@ -1261,7 +1262,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("0219" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 3)
-			Result = ( int(Response[:2], 16) / 200, (100 * int(Response[2:4], 16) / 128) - 100 )
+			Result = ( int(Response[:1], 16) / 200, (100 * int(Response[1:2], 16) / 128) - 100 )
 
 		return Result
 	PidFunctions["0119"] = PID0119
@@ -1279,7 +1280,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("021A" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 3)
-			Result = ( int(Response[:2], 16) / 200, (100 * int(Response[2:4], 16) / 128) - 100 )
+			Result = ( int(Response[:1], 16) / 200, (100 * int(Response[1:2], 16) / 128) - 100 )
 
 		return Result
 	PidFunctions["011A"] = PID011A
@@ -1297,7 +1298,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("021B" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 3)
-			Result = ( int(Response[:2], 16) / 200, (100 * int(Response[2:4], 16) / 128) - 100 )
+			Result = ( int(Response[:1], 16) / 200, (100 * int(Response[1:2], 16) / 128) - 100 )
 
 		return Result
 	PidFunctions["011B"] = PID011B
@@ -1341,7 +1342,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("011F" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 3)
-			Result = 256 * int(Response[:2], 16) + int(Response[2:4], 16)
+			Result = 256 * int(Response[:1], 16) + int(Response[1:2], 16)
 	PidFunctions["011F"] = PID011F
 	PidFunctions["021F"] = PID011F
 
@@ -1365,7 +1366,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("0221" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 3)
-			Result = 256 * int(Response[:2], 16) + int(Response[2:4], 16)
+			Result = 256 * int(Response[:1], 16) + int(Response[1:2], 16)
 
 		return Result
 	PidFunctions["0121"] = PID0121
@@ -1379,7 +1380,7 @@ class ELM327:
 		if '0122' in self.ValidPIDs:
 			Response = self.GetResponse(b'0122\r')
 			Response = self.PruneData(Response, 2)
-			Result = 0.079 * (256 * int(Response[:2], 16) + int(Response[2:4], 16))
+			Result = 0.079 * (256 * int(Response[:1], 16) + int(Response[1:2], 16))
 
 		return Result
 	PidFunctions["0122"] = PID0122
@@ -1392,7 +1393,7 @@ class ELM327:
 		if '0123' in self.ValidPIDs:
 			Response = self.GetResponse(b'0123\r')
 			Response = self.PruneData(Response, 2)
-			Result = 10 * (256 * int(Response[:2], 16) + int(Response[2:4], 16))
+			Result = 10 * (256 * int(Response[:1], 16) + int(Response[1:2], 16))
 
 		return Result
 	PidFunctions["0123"] = PID0123
@@ -1409,7 +1410,12 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("0224" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 5)
-			Result = ( (2 / 65536) * (256 * int(Response[:2], 16) + int(Response[2:4], 16)), (8 / 65536) * (256 * int(Response[4:6], 16) + int(Response[6:8], 16)) )
+			if DEBUG == "ON":
+				print("1 " + Response[:1], 16)
+				print("2 " + Response[1:2], 16)
+				print("3 " + Response[2:3], 16)
+				print("4 " + Response[3:4], 16)
+			Result = ( (2 / 65536) * (256 * int(Response[:1], 16) + int(Response[1:2], 16)), (8 / 65536) * (256 * int(Response[2:3], 16) + int(Response[3:4], 16)) )
 		if DEBUG == "ON":
 			print(Result)
 		return Result
@@ -1442,7 +1448,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("0231" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 3)
-			Result = 256 * int(Response[:2], 16) + int(Response[2:4], 16)
+			Result = 256 * int(Response[:1], 16) + int(Response[1:2], 16)
 
 		return Result
 	PidFunctions["0131"] = PID0131
@@ -1464,7 +1470,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("0234" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 5)
-			Result = ( (2 / 65536) * (256 * int(Response[:2], 16) + int(Response[2:4], 16)), int(Response[4:6], 16) + (int(Response[6:8], 16) / 256) - 128 )
+			Result = ( (2 / 65536) * (256 * int(Response[:1], 16) + int(Response[1:2], 16)), int(Response[2:3], 16) + (int(Response[3:4], 16) / 256) - 128 )
 		if DEBUG == "ON":
 			print(Result)
 		return Result
