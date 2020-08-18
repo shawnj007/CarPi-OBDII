@@ -63,18 +63,24 @@ STRING_NO_DESCRIPTION = "[NO DESCRIPTION]"
 
 # Data fields.
 FIELD_PID_DESCRIPTION = 0
+
 FIELD_PID_FORMAT_1 = 1
 FIELD_PID_MIN_1 = 2
 FIELD_PID_MAX_1 = 3
 FIELD_PID_HIGH_1 = 4
 FIELD_PID_MID_1 = 5
 FIELD_PID_LOW_1 = 6
-FIELD_PID_FORMAT_2 = 7
-FIELD_PID_MIN_2 = 8
-FIELD_PID_MAX_2 = 9
-FIELD_PID_HIGH_2 = 10
-FIELD_PID_MID_2 = 11
-FIELD_PID_LOW_2 = 12
+FIELD_PID_BLU_1 = 7
+FIELD_PID_RED_1 = 8
+
+FIELD_PID_FORMAT_2 = 9
+FIELD_PID_MIN_2 = 10
+FIELD_PID_MAX_2 = 11
+FIELD_PID_HIGH_2 = 12
+FIELD_PID_MID_2 = 13
+FIELD_PID_LOW_2 = 14
+FIELD_PID_BLU_2 = 15
+FIELD_PID_RED_2 = 16
 
 
 # PID Numbers and their function pointers implemented in this class.
@@ -1405,10 +1411,10 @@ class ELM327:
 		if '0124' in self.ValidPIDs:
 			if FreezeIndex == -1:
 				Response = self.GetResponse(b'0124\r')
-				Response = self.PruneData(Response, 4)
+				Response = self.PruneData(Response, 2)
 			else:
 				Response = self.GetResponse(bytearray("0224" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
-				Response = self.PruneData(Response, 5)
+				Response = self.PruneData(Response, 3)
 			Result = ( (2 / 65536) * (256 * int(Response[:2], 16) + int(Response[2:4], 16)), (8 / 65536) * (256 * int(Response[4:6], 16) + int(Response[6:8], 16)) )
 		if DEBUG == "ON":
 			print(Result)
@@ -1460,10 +1466,10 @@ class ELM327:
 		if '0134' in self.ValidPIDs:
 			if FreezeIndex == -1:
 				Response = self.GetResponse(b'0134\r')
-				Response = self.PruneData(Response, 4)
+				Response = self.PruneData(Response, 2)
 			else:
 				Response = self.GetResponse(bytearray("0234" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
-				Response = self.PruneData(Response, 5)
+				Response = self.PruneData(Response, 3)
 			Result = ( (2 / 65536) * (256 * int(Response[:2], 16) + int(Response[2:4], 16)), int(Response[4:6], 16) + (int(Response[6:8], 16) / 256) - 128 )
 		if DEBUG == "ON":
 			print(Result)

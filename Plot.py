@@ -80,6 +80,14 @@ class Plot(Visual.Visual):
 			self.PlotAttrib[PlotIndex]["ValueLow"] = float(ValueDefinition[ELM327.FIELD_PID_LOW_1])
 		else:
 			self.PlotAttrib[PlotIndex]["ValueLow"] = 0
+		if len(ValueDefinition) > ELM327.FIELD_PID_BLU_1:
+			self.PlotAttrib[PlotIndex]["ValueBlu"] = float(ValueDefinition[ELM327.FIELD_PID_BLU_1])
+		else:
+			self.PlotAttrib[PlotIndex]["ValueBlu"] = 0
+		if len(ValueDefinition) > ELM327.FIELD_PID_RED_1:
+			self.PlotAttrib[PlotIndex]["ValueRed"] = float(ValueDefinition[ELM327.FIELD_PID_RED_1])
+		else:
+			self.PlotAttrib[PlotIndex]["ValueRed"] = 0
 
 
 #/***********************************/
