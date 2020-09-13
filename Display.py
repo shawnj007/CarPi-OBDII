@@ -68,10 +68,15 @@ class Display:
 
 	def __init__(self):
 		# Initialise PyGame environment for graphics and sound.
+		os.environ['SDL_VIDEO_WINDOW_POS'] = "0,0"
 		pygame.init()
+		info = pygame.display.Info()
+
 		pygame.mixer.init()
 		pygame.font.init()
-		self.ThisSurface = pygame.display.set_mode((0, 0), pygame.DOUBLEBUF | pygame.FULLSCREEN | pygame.HWSURFACE)
+		#self.ThisSurface = pygame.display.set_mode((0, 0), pygame.DOUBLEBUF | pygame.FULLSCREEN | pygame.HWSURFACE)
+		self.ThisSurface = pygame.display.set_mode((info.current_w, info.current_h), pygame.DOUBLEBUF, pygame.NOFRAME)
+
 		# Hide mouse pointer, using a touch screen for click events.
 #		pygame.mouse.set_visible(False)
 
@@ -140,13 +145,24 @@ class Display:
 		self.ELM327Info["INFO"] = Button.Button(self.ThisSurface, "INFO", Visual.PRESS_NONE, 0, 2*Visual.BUTTON_HEIGHT, self.DisplayXLen, self.DisplayYLen - 2*Visual.BUTTON_HEIGHT, "", Visual.ALIGN_TEXT_LEFT)
 		self.ELM327Info["CONFIG"] = Button.Button(self.ThisSurface, "CONFIG", Visual.PRESS_DOWN, 9*self.ButtonWidth, Visual.BUTTON_HEIGHT, self.ButtonWidth, Visual.BUTTON_HEIGHT, "IMAGE:ICONS/Config.png")
 		self.ELM327Info["CONNECT"] = Button.Button(self.ThisSurface, "CONNECT", Visual.PRESS_DOWN, self.DisplayXLen - self.ButtonWidth, Visual.BUTTON_HEIGHT, self.ButtonWidth, Visual.BUTTON_HEIGHT, "IMAGE:ICONS/Connect.png")
-
+		"""
 		# Currently selected tab, default meters.
 		self.CurrentTab = self.ELM327Info
 		self.Buttons["ELM327"].SetDown(True)
 		self.Buttons["BUSY"].SetVisible(False)
-
-
+		"""
+		# Currently selected tab, default meters.
+		self.CurrentTab = self.Meters
+		self.Buttons["METERS"].SetDown(True)
+		self.Buttons["BUSY"].SetVisible(False)
+		
+		
+	def go_stop(self):
+		pos = (self.Meters["GO_STOP"].xPos, self.Meters["GO_STOP"].yPos)
+		event = pygame.event.Event(pygame.MOUSEBUTTONDOWN, pos=pos, button=1)
+		pygame.event.post(event)
+		event = pygame.event.Event(pygame.MOUSEBUTTONUP, pos=pos, button=1)
+		pygame.event.post(event)
 
 #/****************************************************/
 #/* Perform required tasks when closing the display. */

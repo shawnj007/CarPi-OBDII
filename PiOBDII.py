@@ -223,13 +223,14 @@ def ConnectELM327(ThisDisplay):
 	# Check for MIL status after connection attempt.
 	if ThisELM327.GetMilOn() == True:
 		FlashVisuals["MIL"] = ThisDisplay.Buttons["MIL"]
+	else:
+		ThisDisplay.go_stop()
 	# Get a list of all valid PIDs the connected ECU supports.
 	ValidPIDs = ThisELM327.GetValidPIDs()
 	# Resume the state of the meters tab where last saved.
 	ThisDisplay.LoadMetersTab(ValidPIDs)
 	# Load the config for the plot series.
 	ThisDisplay.Plots["PLOT"].LoadSeriesConfig(ValidPIDs)
-
 
 
 #/**********************************************/
@@ -629,6 +630,9 @@ while ExitFlag == False:
 						if ThisDisplay.CurrentTab == ThisDisplay.Meters or ThisDisplay.CurrentTab == ThisDisplay.Plots:
 							if LockAquisition.acquire(0):
 								_thread.start_new_thread(AquisitionLoop, (ThisDisplay, ))
+								print("able to lock\n")
+							else:
+								print("unable to lock\n")
 					# If add button is pressed, add a new gadgit to the meters tab.
 					elif ButtonGadgit["BUTTON"] == "LOCK":
 						if ThisDisplay.Meters["LOCK"].GetDown() == False:
