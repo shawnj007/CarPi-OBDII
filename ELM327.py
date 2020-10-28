@@ -369,6 +369,7 @@ class ELM327:
 					if Response != 'OK\n':
 						self.InitResult += "FAILED: AT BRD 45 (Set 57.6kbps)\n"
 					else:
+						print("Set to 57.6kbps")
 						best_baud = SERIAL_PORT_BAUD_2
 
 			# Get the ID, then try to speed up the bus speed	
@@ -385,6 +386,7 @@ class ELM327:
 					if Response != 'OK\n':
 						self.InitResult += "FAILED: AT BRD 23 (Set 115.2kbps)\n"
 					else:
+						print("Set to 115.2kbps")
 						best_baud = SERIAL_PORT_BAUD_3
 
 			# Get the ID, then try to speed up the bus speed	
@@ -401,6 +403,7 @@ class ELM327:
 					if Response != 'OK\n':
 						self.InitResult += "FAILED: AT BRD 11 (Set 230.4kbps)\n"
 					else:
+						print("Set to 230.4kbps")
 						best_baud = SERIAL_PORT_BAUD_4
 
 			# Get the ID, then try to speed up the bus speed	
@@ -417,6 +420,7 @@ class ELM327:
 					if Response != 'OK\n':
 						self.InitResult += "FAILED: AT BRD 08 (Set 500.0kbps)\n"
 					else:
+						print("Set to 500.0kbps")
 						best_baud = SERIAL_PORT_BAUD_5
 		
 			# Echo Off, for faster communications.
