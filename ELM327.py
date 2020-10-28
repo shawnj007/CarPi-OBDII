@@ -351,7 +351,7 @@ class ELM327:
 
 			# Get the ID, then try to speed up the bus speed			
 			ResponseID = self.GetResponse(b'AT I\r')
-			Response = self.GetResponse(b'AT BRD 45\r')
+			Response = self.ELM327.write(b'AT BRD 45\r')
 			if Response == 'OK\n':
 				self.ELM327 = serial.Serial(SERIAL_PORT_NAME, SERIAL_PORT_BAUD_2)
 				time.sleep(1)
@@ -371,7 +371,7 @@ class ELM327:
 						best_baud = SERIAL_PORT_BAUD_2
 
 			# Get the ID, then try to speed up the bus speed	
-			Response = self.GetResponse(b'AT BRD 23\r')
+			Response = self.ELM327.write(b'AT BRD 23\r')
 			if Response == 'OK\n':
 				self.ELM327 = serial.Serial(SERIAL_PORT_NAME, SERIAL_PORT_BAUD_3)
 				s = self.ELM327.read()
@@ -389,7 +389,7 @@ class ELM327:
 						best_baud = SERIAL_PORT_BAUD_3
 
 			# Get the ID, then try to speed up the bus speed	
-			Response = self.GetResponse(b'AT BRD 11\r')
+			Response = self.ELM327.write(b'AT BRD 11\r')
 			if Response == 'OK\n':
 				self.ELM327 = serial.Serial(SERIAL_PORT_NAME, SERIAL_PORT_BAUD_4)
 				s = self.ELM327.read()
@@ -407,7 +407,7 @@ class ELM327:
 						best_baud = SERIAL_PORT_BAUD_4
 
 			# Get the ID, then try to speed up the bus speed	
-			Response = self.GetResponse(b'AT BRD 08\r')
+			Response = self.ELM327.write(b'AT BRD 08\r')
 			if Response == 'OK\n':
 				self.ELM327 = serial.Serial(SERIAL_PORT_NAME, SERIAL_PORT_BAUD_5)
 				s = self.ELM327.read()
