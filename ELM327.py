@@ -41,14 +41,11 @@ CONNECT_CAN_BUS_FAIL = 2
 
 # Serial port constants.
 SERIAL_PORT_NAME = None
-#SERIAL_PORT_BAUD = 115200
-#SERIAL_PORT_BAUD = 57600
 SERIAL_PORT_BAUD_1 = 38400
 SERIAL_PORT_BAUD_2 = 57600
 SERIAL_PORT_BAUD_3 = 115200
 SERIAL_PORT_BAUD_4 = 230400
 SERIAL_PORT_BAUD_5 = 500000
-#SERIAL_PORT_BAUD = 9600
 SERIAL_PORT_TIME_OUT = 7
 SERIAL_LINEFEED_TYPE = b'\r'
 #SERIAL_LINEFEED_TYPE = b'\r\n'
@@ -600,7 +597,7 @@ class ELM327:
 			ReadChar = self.ELM327.read()
 			if ReadChar[0] > 127:
 				if DEBUG == "ON":
-					print("REJECTING RECEIVED CHARACTER: " + str(int(ReadChar[0])))
+					print("REJECTING RECEIVED CHARACTER: " + str(int(ReadChar[0])) + " [" + ReadChar[0] + "] ")
 			elif ReadChar != b'>':
 				Response += str(ReadChar, 'utf-8')
 		Result = Response.replace('\r', '\n').replace('\n\n', '\n').replace('NO DATA', '00000000000000').replace('SEARCHING...\n', '\n')
