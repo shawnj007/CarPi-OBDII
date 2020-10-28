@@ -597,7 +597,7 @@ class ELM327:
 			ReadChar = self.ELM327.read()
 			if ReadChar[0] > 127:
 				if DEBUG == "ON":
-					print("REJECTING RECEIVED CHARACTER: " + str(int(ReadChar[0])) + " [" + ReadChar[0] + "] ")
+					print("REJECTING RECEIVED CHARACTER: " + str(int(ReadChar[0])) + str(" [%s] " % (ReadChar[0]))
 			elif ReadChar != b'>':
 				Response += str(ReadChar, 'utf-8')
 		Result = Response.replace('\r', '\n').replace('\n\n', '\n').replace('NO DATA', '00000000000000').replace('SEARCHING...\n', '\n')
