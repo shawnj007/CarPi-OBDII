@@ -363,6 +363,7 @@ class ELM327:
 				if s != ResponseID:
 					self.ELM327 = serial.Serial(SERIAL_PORT_NAME, best_baud)
 					time.sleep(ELM_RESET_PERIOD)
+					print("FAILED to set 57.6kbps")
 				else:
 					Response = self.GetResponse(b'\r')
 					if Response != 'OK\n':
@@ -378,6 +379,7 @@ class ELM327:
 				if s != ResponseID:
 					self.ELM327 = serial.Serial(SERIAL_PORT_NAME, best_baud)
 					time.sleep(ELM_RESET_PERIOD)
+					print("FAILED to set 115.2kbps")
 				else:
 					Response = self.GetResponse(b'\r')
 					if Response != 'OK\n':
@@ -393,6 +395,7 @@ class ELM327:
 				if s != ResponseID:
 					self.ELM327 = serial.Serial(SERIAL_PORT_NAME, best_baud)
 					time.sleep(ELM_RESET_PERIOD)
+					print("FAILED to set 230.4kbps")
 				else:
 					Response = self.GetResponse(b'\r')
 					if Response != 'OK\n':
@@ -408,6 +411,7 @@ class ELM327:
 				if s != ResponseID:
 					self.ELM327 = serial.Serial(SERIAL_PORT_NAME, best_baud)
 					time.sleep(ELM_RESET_PERIOD)
+					print("FAILED to set 500.0kbps")
 				else:
 					Response = self.GetResponse(b'\r')
 					if Response != 'OK\n':
