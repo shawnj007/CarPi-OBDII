@@ -43,7 +43,8 @@ CONNECT_CAN_BUS_FAIL = 2
 SERIAL_PORT_NAME = None
 #SERIAL_PORT_BAUD = 115200
 #SERIAL_PORT_BAUD = 57600
-SERIAL_PORT_BAUD = 38400
+SERIAL_PORT_BAUD_1 = 38400
+SERIAL_PORT_BAUD_2 = 115200
 #SERIAL_PORT_BAUD = 9600
 SERIAL_PORT_TIME_OUT = 7
 SERIAL_LINEFEED_TYPE = b'\r'
@@ -335,7 +336,7 @@ class ELM327:
 # /* Open the required serial port which the ELM327 device is on. */
 #/****************************************************************/
 		try:
-			self.ELM327 = serial.Serial(SERIAL_PORT_NAME, SERIAL_PORT_BAUD)
+			self.ELM327 = serial.Serial(SERIAL_PORT_NAME, SERIAL_PORT_BAUD_1)
 			self.ELM327.timeout = SERIAL_PORT_TIME_OUT
 			self.ELM327.write_timeout = SERIAL_PORT_TIME_OUT
 
@@ -345,7 +346,73 @@ class ELM327:
 			Response = self.GetResponse(b'AT Z\r')
 
 			time.sleep(ELM_RESET_PERIOD)
+			
+			best_baud = SERIAL_PORT_BAUD_1
 
+			# Get the ID, then try to speed up the bus speed			
+			ResponseID = self.GetResponse(b'AT I\r')
+			Response = self.GetResponse(b'AT BRD 45\r')
+			if Response == 'OK\n':
+				self.ELM327 = serial.Serial(SERIAL_PORT_NAME, SERIAL_PORT_BAUD_2)
+				s = self.ELM327.read()
+				if s != ResponseID:
+					self.ELM327 = serial.Serial(SERIAL_PORT_NAME, best_baud)
+					time.sleep(ELM_RESET_PERIOD)
+				else:
+					Response = self.GetResponse(b'\r')
+					if Response != 'OK\n':
+						self.InitResult += "FAILED: AT BRD 45 (Set 57.6kbps)\n"
+					else:
+						best_baud = SERIAL_PORT_BAUD_2
+
+			# Get the ID, then try to speed up the bus speed			
+			ResponseID = self.GetResponse(b'AT I\r')
+			Response = self.GetResponse(b'AT BRD 23\r')
+			if Response == 'OK\n':
+				self.ELM327 = serial.Serial(SERIAL_PORT_NAME, SERIAL_PORT_BAUD_3)
+				s = self.ELM327.read()
+				if s != ResponseID:
+					self.ELM327 = serial.Serial(SERIAL_PORT_NAME, best_baud)
+					time.sleep(ELM_RESET_PERIOD)
+				else:
+					Response = self.GetResponse(b'\r')
+					if Response != 'OK\n':
+						self.InitResult += "FAILED: AT BRD 23 (Set 115.2kbps)\n"
+					else:
+						best_baud = SERIAL_PORT_BAUD_3
+
+			# Get the ID, then try to speed up the bus speed			
+			ResponseID = self.GetResponse(b'AT I\r')
+			Response = self.GetResponse(b'AT BRD 11\r')
+			if Response == 'OK\n':
+				self.ELM327 = serial.Serial(SERIAL_PORT_NAME, SERIAL_PORT_BAUD_4)
+				s = self.ELM327.read()
+				if s != ResponseID:
+					self.ELM327 = serial.Serial(SERIAL_PORT_NAME, best_baud)
+					time.sleep(ELM_RESET_PERIOD)
+				else:
+					Response = self.GetResponse(b'\r')
+					if Response != 'OK\n':
+						self.InitResult += "FAILED: AT BRD 11 (Set 230.4kbps)\n"
+					else:
+						best_baud = SERIAL_PORT_BAUD_4
+
+			# Get the ID, then try to speed up the bus speed			
+			ResponseID = self.GetResponse(b'AT I\r')
+			Response = self.GetResponse(b'AT BRD 08\r')
+			if Response == 'OK\n':
+				self.ELM327 = serial.Serial(SERIAL_PORT_NAME, SERIAL_PORT_BAUD_5)
+				s = self.ELM327.read()
+				if s != ResponseID:
+					self.ELM327 = serial.Serial(SERIAL_PORT_NAME, best_baud)
+					time.sleep(ELM_RESET_PERIOD)
+				else:
+					Response = self.GetResponse(b'\r')
+					if Response != 'OK\n':
+						self.InitResult += "FAILED: AT BRD 08 (Set 500.0kbps)\n"
+					else:
+						best_baud = SERIAL_PORT_BAUD_5
+		
 			# Echo Off, for faster communications.
 			Response = self.GetResponse(b'AT E0\r').replace('\r', '')
 			if Response != 'AT E0\nOK\n':
@@ -374,19 +441,19 @@ class ELM327:
 				Response = self.GetResponse(b'AT S0\r')
 				if Response != 'OK\n':
 					self.InitResult += "FAILED: AT S0 (Set Space Characters Off)\n"
-
+			
 			# Set CAN communication protocol to ISO 9141-2 or auto detect on fail.
 			if self.InitResult == "":
 				Response = self.GetResponse(b'AT SP A3\r')
 				if Response != 'OK\n':
 					self.InitResult += "FAILED: AT SP A3 (Set Protocol ISO 9141-2 / Auto)\n"
-
+			"""
 			# Set CAN Baud to high speed.
 			if self.InitResult == "":
 				Response = self.GetResponse(b'AT IB 10\r')
 				if Response[-3:] != 'OK\n':
 					self.InitResult += "FAILED: AT IB 10 (Set High Speed CAN BUS)\n"
-
+			"""
 			if self.InitResult != "":
 				Result = CONNECT_ELM327_FAIL
 				self.InitResult += "FAILED TO INITIALIZE ELM327 DEVICE.\n"
