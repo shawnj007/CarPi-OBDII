@@ -351,8 +351,11 @@ class ELM327:
 
 			# Get the ID, then try to speed up the bus speed			
 			ResponseID = self.GetResponse(b'AT I\r')
-			Response = self.GetResponse(b'AT BRD 256\r')
 			
+			# Set the timing for baud rate change
+			Response = self.GetResponse(b'AT BRT 0\r')
+			
+			# Attempt progressively faster baud rate changes
 			Response = self.GetResponse(b'AT BRD 45\r')
 			if Response == 'OK\n':
 				self.ELM327 = serial.Serial(SERIAL_PORT_NAME, SERIAL_PORT_BAUD_2)
