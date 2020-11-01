@@ -31,7 +31,6 @@
 import time
 import serial
 
-
 DEBUG = "OFF"
 
 # Connection to ELM327 device status.
@@ -348,87 +347,31 @@ class ELM327:
 			time.sleep(ELM_RESET_PERIOD)
 			
 			best_baud = SERIAL_PORT_BAUD_1
-
-			# Get the ID, then try to speed up the bus speed			
-			ResponseID = self.GetResponse(b'AT I\r')
 			
-			# Set the timing for baud rate change
-			Response = self.GetResponse(b'AT BRT 0\r')
-			
-			# Attempt progressively faster baud rate changes
-			Response = self.GetResponse(b'AT BRD 45\r')
-			if Response == 'OK\n':
-				self.ELM327 = serial.Serial(SERIAL_PORT_NAME, SERIAL_PORT_BAUD_2)
-				Response = self.GetResponse(b'')
-				if Response != ResponseID:
-					self.ELM327 = serial.Serial(SERIAL_PORT_NAME, best_baud)
-					print("FAILED to set 57.6kbps")
-				else:
-					Response = self.GetResponse(b'\r')
-					if Response != 'OK\n':
-						self.InitResult += "FAILED: AT BRD 45 (Set 57.6kbps)\n"
-						print("FAILED to set 57.6kbps")
-					else:
-						print("Set to 57.6kbps")
-						best_baud = SERIAL_PORT_BAUD_2
-
-			# Get the ID, then try to speed up the bus speed	
-			Response = self.GetResponse(b'AT BRD 23\r')
-			if Response == 'OK\n':
-				self.ELM327 = serial.Serial(SERIAL_PORT_NAME, SERIAL_PORT_BAUD_3)
-				Response = self.GetResponse(b'')
-				if Response != ResponseID:
-					self.ELM327 = serial.Serial(SERIAL_PORT_NAME, best_baud)
-					print("FAILED to set 115.2kbps")
-				else:
-					Response = self.GetResponse(b'\r')
-					if Response != 'OK\n':
-						self.InitResult += "FAILED: AT BRD 23 (Set 115.2kbps)\n"
-						print("FAILED to set 115.2kbps")
-					else:
-						print("Set to 115.2kbps")
-						best_baud = SERIAL_PORT_BAUD_3
-
-			# Get the ID, then try to speed up the bus speed	
-			Response = self.GetResponse(b'AT BRD 11\r')
-			if Response == 'OK\n':
-				self.ELM327 = serial.Serial(SERIAL_PORT_NAME, SERIAL_PORT_BAUD_4)
-				Response = self.GetResponse(b'')
-				if Response != ResponseID:
-					self.ELM327 = serial.Serial(SERIAL_PORT_NAME, best_baud)
-					print("FAILED to set 230.4kbps")
-				else:
-					Response = self.GetResponse(b'\r')
-					if Response != 'OK\n':
-						self.InitResult += "FAILED: AT BRD 11 (Set 230.4kbps)\n"
-						print("FAILED to set 230.4kbps")
-					else:
-						print("Set to 230.4kbps")
-						best_baud = SERIAL_PORT_BAUD_4
-
-			# Get the ID, then try to speed up the bus speed	
-			Response = self.GetResponse(b'AT BRD 08\r')
-			if Response == 'OK\n':
-				self.ELM327 = serial.Serial(SERIAL_PORT_NAME, SERIAL_PORT_BAUD_5)
-				Response = self.GetResponse(b'')
-				if Response != ResponseID:
-					self.ELM327 = serial.Serial(SERIAL_PORT_NAME, best_baud)
-					time.sleep(ELM_RESET_PERIOD)
-					print("FAILED to set 500.0kbps")
-				else:
-					Response = self.GetResponse(b'\r')
-					if Response != 'OK\n':
-						self.InitResult += "FAILED: AT BRD 08 (Set 500.0kbps)\n"
-						print("FAILED to set 500.0kbps")
-					else:
-						print("Set to 500.0kbps")
-						best_baud = SERIAL_PORT_BAUD_5
-		
 			# Echo Off, for faster communications.
 			Response = self.GetResponse(b'AT E0\r').replace('\r', '')
 			if Response != 'AT E0\nOK\n':
 				self.InitResult += "FAILED: AT E0 (Set Echo Off)\n"
 
+			# Get the ID, then try to speed up the bus speed			
+			ResponseID = self.GetResponse(b'AT I\r')
+			print(ResponseID)
+			
+			# Set the timing for baud rate change
+			Response = self.GetResponse(b'AT BRT 00\r')
+			print ("timeout change: " + str(Response))
+			
+			#best_baud = self.ChangeBaud(b'AT BRD 45\r', ResponseID, SERIAL_PORT_BAUD_2)
+			#best_baud = self.ChangeBaud(b'AT BRD 23\r', ResponseID, SERIAL_PORT_BAUD_3)
+			#best_baud = self.ChangeBaud(b'AT BRD 11\r', ResponseID, SERIAL_PORT_BAUD_4)
+			best_baud = self.ChangeBaud(b'AT BRD 08\r', ResponseID, SERIAL_PORT_BAUD_5)
+			
+			print ("baud set to: " + str(best_baud))
+			
+			# Set the timing for baud rate change
+			Response = self.GetResponse(b'AT BRT 0F\r')
+			print ("timeout change: " + str(Response))
+		
 			# Linefeed off, for faster communications.
 			if self.InitResult == "":
 				Response = self.GetResponse(b'AT L0\r').replace('\r', '')
@@ -498,6 +441,7 @@ class ELM327:
 
 			# Get Mode 01 PID support [01 -> 20].
 			self.PID0100()
+			"""
 			# If Mode 01 PID 20 is supported, get Mode 01 PID support [21 -> 40].
 			if '0120' in self.ValidPIDs:
 				self.PID0120()
@@ -520,6 +464,14 @@ class ELM327:
 			self.PID050100()
 			# Get Mode 09 PID support.
 			self.PID0900()
+			"""
+			
+			self.PID0120()
+			self.PID0140()
+			self.PID0160()
+			self.PID0180()
+			self.PID01A0()
+			self.PID01C0()
 
 		return Result
 
@@ -584,31 +536,90 @@ class ELM327:
 #/* Otherwise a timeout occurs waiting for a      */
 #/* response.                                     */
 #/*************************************************/
-	def GetResponse(self, Data):
+	def GetResponse(self, Data, no_ret = False):
 		Data = Data.replace(b'\r', SERIAL_LINEFEED_TYPE)
 
-		if DEBUG == "ON":
-			print("DEBUG SENDING [" + str(len(Data)) + "] " + str(Data))
-
-		self.ELM327.write(Data)
+		if len(Data) > 0:
+			if DEBUG == "ON":
+				print("DEBUG SENDING [" + str(len(Data)) + "] " + str(Data))
+			self.ELM327.write(Data)
+			
 		Response = ""
 		ReadChar = 1
-		while ReadChar != b'>' and ReadChar != b'' and ReadChar != 0:
+		while ReadChar != b'>' and ReadChar != b'' and ReadChar != 0: #or (len(Response) >= 3 and Response[-3:] != b'OK\r'):
 			ReadChar = self.ELM327.read()
 			if ReadChar[0] > 127:
 				if DEBUG == "ON":
 					print("REJECTING RECEIVED CHARACTER: " + str(int(ReadChar[0])) + str(" [%c] " % (ReadChar[0])))
 			elif ReadChar != b'>':
-				Response += str(ReadChar, 'utf-8')
+				Response += str(ReadChar.replace(b'\r',b'\n'), 'utf-8')
+				#print("[" + str('%r' % (Response)) + "]")
+				
+				if no_ret and Response == 'OK\n':
+					#print("Response matches")
+					break
+				
 		Result = Response.replace('\r', '\n').replace('\n\n', '\n').replace('NO DATA', '00000000000000').replace('SEARCHING...\n', '\n')
 		if Result[-1:] != '\n':
 			Result += '\n'
 
 		if DEBUG == "ON":
-			print("DEBUG RECEIVED [" + str(len(Result)) + "] " + str(Result))
+			print("DEBUG RECEIVED [" + str(len(Result)) + "] " + str('%r' % Result))
 
 		return Result
 
+	def ChangeBaud(self, Data, ResponseID, newBaud):
+		
+		oldBaud = self.ELM327.baudrate
+		
+		if len(Data) > 0:
+			if DEBUG == "ON":
+				print("DEBUG SENDING [" + str(len(Data)) + "] " + str(Data))
+			self.ELM327.write(Data)
+			
+		Response = ""
+		ReadChar = 1
+		while ReadChar != b'\n':
+			ReadChar = self.ELM327.read()
+			if ReadChar[0] > 127:
+				if DEBUG == "ON":
+					print("REJECTING RECEIVED CHARACTER: " + str(int(ReadChar[0])) + str(" [%c] " % (ReadChar[0])))
+			else:
+				Response += str(ReadChar.replace(b'\r',b'\n'), 'utf-8')
+				#print("[" + str('%r' % (Response)) + "]")
+				if Response == 'OK\n':
+					#print("Response matches")
+					break
+		
+		if Response == 'OK\n':
+			self.ELM327.baudrate = newBaud
+			
+			Response = ""
+			ReadChar = 1
+			while ReadChar != b'\n' and ReadChar != b'\r':
+				ReadChar = self.ELM327.read()
+				if ReadChar[0] > 127:
+					if DEBUG == "ON":
+						print("REJECTING RECEIVED CHARACTER: " + str(int(ReadChar[0])) + str(" [%c] " % (ReadChar[0])))
+				else:
+					Response += str(ReadChar.replace(b'\r',b'\n'), 'utf-8')
+					#print("[" + str('%r' % (Response)) + "]")
+			
+			if Response != ResponseID:
+				self.ELM327.baudrate = (oldBaud)
+				print("FAILED to set baud " + str(newBaud))
+			else:
+				Response = self.GetResponse(b'\r')
+				if Response != 'OK\n':
+					self.InitResult += "FAILED\n"
+					print("FAILED to set baud " + str(newBaud))
+				else:
+					print("Set to  " + str(newBaud))
+					best_baud = newBaud
+		else:
+			print("Command failed with : " + Response)
+	
+		return self.ELM327.baudrate
 
 
 #/*****************************************************************/

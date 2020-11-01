@@ -80,7 +80,6 @@ import Display
 import PDF
 
 
-
 DISPLAY_PERIOD = 100
 TIMER_PERIOD = 100
 
@@ -223,8 +222,8 @@ def ConnectELM327(ThisDisplay):
 	# Check for MIL status after connection attempt.
 	if ThisELM327.GetMilOn() == True:
 		FlashVisuals["MIL"] = ThisDisplay.Buttons["MIL"]
-	else:
-		ThisDisplay.go_stop()
+	#else:
+	#	ThisDisplay.go_stop()
 	# Get a list of all valid PIDs the connected ECU supports.
 	ValidPIDs = ThisELM327.GetValidPIDs()
 	# Resume the state of the meters tab where last saved.

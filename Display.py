@@ -28,12 +28,12 @@ import Visual
 import Button
 import Gadgit
 import Plot
-
+#import _thread
 
 
 DEBUG = "OFF"
 
-
+#LockVisuals = _thread.allocate_lock()
 
 class Display:
 	# List of meters to be displayed on the Meters tab.
@@ -75,7 +75,7 @@ class Display:
 		pygame.mixer.init()
 		pygame.font.init()
 		#self.ThisSurface = pygame.display.set_mode((0, 0), pygame.DOUBLEBUF | pygame.FULLSCREEN | pygame.HWSURFACE)
-		self.ThisSurface = pygame.display.set_mode((info.current_w, info.current_h), pygame.DOUBLEBUF, pygame.NOFRAME)
+		self.ThisSurface = pygame.display.set_mode((800,480), pygame.NOFRAME)
 
 		# Hide mouse pointer, using a touch screen for click events.
 #		pygame.mouse.set_visible(False)
@@ -145,18 +145,20 @@ class Display:
 		self.ELM327Info["INFO"] = Button.Button(self.ThisSurface, "INFO", Visual.PRESS_NONE, 0, 2*Visual.BUTTON_HEIGHT, self.DisplayXLen, self.DisplayYLen - 2*Visual.BUTTON_HEIGHT, "", Visual.ALIGN_TEXT_LEFT)
 		self.ELM327Info["CONFIG"] = Button.Button(self.ThisSurface, "CONFIG", Visual.PRESS_DOWN, 9*self.ButtonWidth, Visual.BUTTON_HEIGHT, self.ButtonWidth, Visual.BUTTON_HEIGHT, "IMAGE:ICONS/Config.png")
 		self.ELM327Info["CONNECT"] = Button.Button(self.ThisSurface, "CONNECT", Visual.PRESS_DOWN, self.DisplayXLen - self.ButtonWidth, Visual.BUTTON_HEIGHT, self.ButtonWidth, Visual.BUTTON_HEIGHT, "IMAGE:ICONS/Connect.png")
-		"""
+
 		# Currently selected tab, default meters.
 		self.CurrentTab = self.ELM327Info
 		self.Buttons["ELM327"].SetDown(True)
 		self.Buttons["BUSY"].SetVisible(False)
+
 		"""
 		# Currently selected tab, default meters.
 		self.CurrentTab = self.Meters
 		self.Buttons["METERS"].SetDown(True)
 		self.Buttons["BUSY"].SetVisible(False)
-		
-		
+		"""
+
+
 	def go_stop(self):
 		pos = (self.Meters["GO_STOP"].xPos, self.Meters["GO_STOP"].yPos)
 		event = pygame.event.Event(pygame.MOUSEBUTTONDOWN, pos=pos, button=1)
@@ -274,6 +276,9 @@ class Display:
 	def IsEvent(self, EventType, xPos, yPos, PointerButton, xOffset = 0, yOffset = 0):
 		Result = False
 
+		#while LockVisuals.locked() == True:
+		#	sleep(1)
+
 		# Check for gadgit touches on the currently selected tab only, in the correct Z order.
 		for ThisVisual in reversed(Visual.VisualZOrder):
 			for ThisGadget in self.CurrentTab:
@@ -368,11 +373,12 @@ class Display:
 			self.Buttons[ThisButton].Display(self.ThisSurface)
 
 		# Display all gadgets on the selected tab in the correct Z order.
+		#if LockVisuals.acquire(0):
 		for ThisVisual in Visual.VisualZOrder:
 			for ThisGadget in self.CurrentTab:
 				if type(self.CurrentTab[ThisGadget]) is not str and self.CurrentTab[ThisGadget] == ThisVisual:
 					self.CurrentTab[ThisGadget].Display(self.ThisSurface)
-
+		#	LockVisuals.release()
 		# Update the display.
 		pygame.display.flip()
 
