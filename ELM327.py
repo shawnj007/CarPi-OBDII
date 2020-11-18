@@ -1595,6 +1595,23 @@ class ELM327:
 # PID0145 Relative throttle position
 # PID0146 Ambient air pressure
 # PID0147 Absolute throttle position B
+	def PID0147(self, FreezeIndex = -1):
+		Result = STRING_NO_DATA
+
+		if '0147' in self.ValidPIDs:
+			if FreezeIndex == -1:
+				Response = self.GetResponse(b'0147\r')
+				Response = self.PruneData(Response, 2)
+			else:
+				Response = self.GetResponse(bytearray("0211" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
+				Response = self.PruneData(Response, 3)
+			Result = 100 * int(Response[:2], 16) / 255
+		if DEBUG == "ON":
+			print(Result)
+		return Result
+	PidFunctions["0147"] = PID0147
+	PidFunctions["0247"] = PID0147
+	
 # PID0148 Absolute throttle position C
 # PID0149 Accelerator pedal position D
 # PID014A Accelerator pedal position E
@@ -1633,6 +1650,23 @@ class ELM327:
 # PID0162 Actual engine - percent torque
 # PID0163 Engine reference torque
 # PID0164 Engine percent torque data
+	def PID0164(self, FreezeIndex = -1):
+		Result = STRING_NO_DATA
+
+		if '0164' in self.ValidPIDs:
+			if FreezeIndex == -1:
+				Response = self.GetResponse(b'0164\r')
+				Response = self.PruneData(Response, 2)
+			else:
+				Response = self.GetResponse(bytearray("0211" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
+				Response = self.PruneData(Response, 3)
+			Result = 100 * int(Response[:2], 16) / 255
+		if DEBUG == "ON":
+			print(Result)
+		return Result
+	PidFunctions["0164"] = PID0164
+	PidFunctions["0264"] = PID0164
+
 # PID0165 Auxiliary input / output supported
 # PID0166 Mass air flow sensor
 # PID0167 Engine coolant temperature
@@ -1674,6 +1708,23 @@ class ELM327:
 # PID0182 Engine run time for Auxiliary Emissions Control Device(AECD)
 # PID0183 NOx sensor
 # PID0184 Manifold surface temperature
+	def PID0184(self, FreezeIndex = -1):
+		Result = STRING_NO_DATA
+
+		if '0184' in self.ValidPIDs:
+			if FreezeIndex == -1:
+				Response = self.GetResponse(b'0184\r')
+				Response = self.PruneData(Response, 2)
+			else:
+				Response = self.GetResponse(bytearray("0284" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
+				Response = self.PruneData(Response, 3)
+			Result = int(Response, 16) - 40
+		if DEBUG == "ON":
+			print(Result)
+		return Result
+	PidFunctions["0184"] = PID0184
+	PidFunctions["0284"] = PID0184
+
 # PID0185 NOx reagent system
 # PID0186 Particulate matter (PM) sensor
 # PID0187 Intake manifold absolute pressure
