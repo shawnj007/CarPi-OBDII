@@ -130,7 +130,7 @@
 81 Engine run time for Auxiliary Emissions Control Device(AECD)|{0[0]:s}
 82 Engine run time for Auxiliary Emissions Control Device(AECD)|{0[0]:s}
 83 NOx sensor|{0[0]:s}
-84 Manifold surface temp|{0:3.0f}°C|-40|215|100|0|0
+84 Manifold temp|{0:3.0f}°C|-40|240|200|100|60|0|0
 85 NOx reagent system|{0[0]:s}
 86 Particulate matter (PM) sensor|{0[0]:s}
 87 Intake manifold absolute pressure|{0[0]:s}
