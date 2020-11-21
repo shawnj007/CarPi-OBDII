@@ -1605,7 +1605,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("0211" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 3)
-			Result = 100 * int(Response[:2], 16) / 255
+			Result = int(Response, 16)
 		if DEBUG == "ON":
 			print(Result)
 		return Result
@@ -1660,7 +1660,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("0211" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 3)
-			Result = 100 * int(Response[:2], 16) / 255
+			Result = int(Response, 16)
 		if DEBUG == "ON":
 			print(Result)
 		return Result
@@ -1718,7 +1718,7 @@ class ELM327:
 			else:
 				Response = self.GetResponse(bytearray("0284" + "{:02d}".format(FreezeIndex) + "\r", 'UTF-8'))
 				Response = self.PruneData(Response, 3)
-			Result = int(Response, 16) - 40
+			Result = int(Response, 16)
 		if DEBUG == "ON":
 			print(Result)
 		return Result
